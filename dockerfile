@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-alpine
 WORKDIR /app
 
 # Copy the Spring Boot jar to the working directory
-COPY /home/user/Spring/springboot-react-mydemo/target/springboot-react-mydemo-0.0.1-SNAPSHOT.jar
+COPY /home/user/Spring/springboot-react-mydemo/target/springboot-react-mydemo-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the port that your Spring Boot app runs on
 EXPOSE 8080
