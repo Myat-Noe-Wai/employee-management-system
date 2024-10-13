@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import net.javaguides.springboot.model.Role;
 import net.javaguides.springboot.service.RoleService;
 
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/roles")
 public class RoleController {

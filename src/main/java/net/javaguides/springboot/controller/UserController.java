@@ -14,7 +14,8 @@ import net.javaguides.springboot.DTO.UserDTO;
 import net.javaguides.springboot.service.UserService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RequestMapping("api/v1/user")
 public class UserController {
     @Autowired

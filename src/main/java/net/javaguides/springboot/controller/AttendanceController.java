@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import net.javaguides.springboot.model.Attendance;
 import net.javaguides.springboot.service.AttendanceService;
 
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/attendance")
 public class AttendanceController {

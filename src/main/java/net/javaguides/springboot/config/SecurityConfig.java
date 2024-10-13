@@ -23,7 +23,8 @@ public class SecurityConfig {
             .and()
             .csrf().disable() // Disable CSRF for simplicity (modify as per your app's needs)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/v1/user/**", "/api/v1/employees/**", "api/roles/**", "api/attendance/**", "api/leave-requests/**", "api/employee-attendance/**").permitAll() // Allow access to employee endpoints
+//                .requestMatchers("/api/v1/user/**", "/api/v1/employees/**", "api/roles/**", "api/attendance/**", "api/leave-requests/**", "api/employee-attendance/**").permitAll() // Allow access to employee endpoints
+            	.requestMatchers("/**").permitAll()
                 .anyRequest().authenticated() // Authenticate all other requests
             );
         
@@ -37,7 +38,8 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:3000") // Allow React frontend
+//                        .allowedOrigins("http://localhost:3000") // Allow React frontend
+                		.allowedOrigins("*")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
