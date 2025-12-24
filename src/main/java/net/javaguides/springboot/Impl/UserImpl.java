@@ -1,6 +1,8 @@
 package net.javaguides.springboot.Impl;
 import java.util.Optional;
 
+import net.javaguides.springboot.DTO.UserResponseDTO;
+import net.javaguides.springboot.shared.exception.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,15 +21,22 @@ public class UserImpl implements UserService{
     private PasswordEncoder passwordEncoder;
     
     @Override
-    public String addUser(UserDTO userDTO) {
-    	User user = new User(
-    			userDTO.getUserid(),
-    			userDTO.getUsername(),
-    			userDTO.getEmail(),
-               this.passwordEncoder.encode(userDTO.getPassword())
+    public ApiResponse<UserResponseDTO> addUser(UserDTO userDTO) {
+        User user = new User();
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setRole("employee"); // default role
+        User savedUser = userRepo.save(user);
+
+        UserResponseDTO responseDTO = new UserResponseDTO(
+                savedUser.getUserId(),
+                savedUser.getUsername(),
+                savedUser.getEmail(),
+                savedUser.getRole()
         );
-    	userRepo.save(user);
-        return user.getUsername();
+
+        return ApiResponse.success("User registered successfully", responseDTO);
     }
     
     UserDTO userDTO;    
@@ -38,8 +47,8 @@ public class UserImpl implements UserService{
         if (user1 != null) {
             String password = loginDTO.getPassword();
             String encodedPassword = user1.getPassword();
-//            Boolean isPwdRight = passwordEncoder.matches(password, encodedPassword);
-            Boolean isPwdRight = false;
+            Boolean isPwdRight = passwordEncoder.matches(password, encodedPassword);
+//            Boolean isPwdRight = false;
             if(password.equals(user1.getPassword())) {
             	isPwdRight = true;
             }
@@ -48,10 +57,10 @@ public class UserImpl implements UserService{
                 if (user.isPresent()) {
                 	System.out.println("Role " + user1.getRole());
                 	if(user1.getRole().equals("admin")) {
-                		return new LoginResponse("Admin Login Success", true, user1.getUserid(), user1.getUsername());
+                		return new LoginResponse("Admin Login Success", true, user1.getUserId(), user1.getUsername());
                 	} else {
                 		System.out.print("emp login");
-                		return new LoginResponse("Employee Login Success", true, user1.getUserid(), user1.getUsername());
+                		return new LoginResponse("Employee Login Success", true, user1.getUserId(), user1.getUsername());
                 	}
                 } else {
                     return new LoginResponse("Login Failed", false);

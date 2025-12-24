@@ -1,5 +1,7 @@
 package net.javaguides.springboot.service;
 import net.javaguides.springboot.model.LeaveRequest;
+import net.javaguides.springboot.model.Employee;
+import net.javaguides.springboot.repository.EmployeeRepository;
 import net.javaguides.springboot.repository.LeaveRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +13,9 @@ public class LeaveRequestService {
 
     @Autowired
     private LeaveRequestRepository leaveRequestRepository;
-
+    @Autowired
+    private EmployeeRepository employeeRepository;
+    
     public List<LeaveRequest> getAllLeaveRequests() {
         return leaveRequestRepository.findAll();
     }
@@ -47,7 +51,13 @@ public class LeaveRequestService {
     }
     
     public LeaveRequest applyForLeave(LeaveRequest leaveRequest) {
-    	leaveRequest.setStatus("Pending");
+//    	leaveRequest.setStatus("Pending");
+//        return leaveRequestRepository.save(leaveRequest);
+    	
+    	Long employeeId = leaveRequest.getEmployee().getId();
+		Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new RuntimeException("Employee not found"));
+        leaveRequest.setEmployee(employee);
+        leaveRequest.setStatus("Pending");
         return leaveRequestRepository.save(leaveRequest);
     }
     

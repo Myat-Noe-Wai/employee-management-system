@@ -1,5 +1,7 @@
 package net.javaguides.springboot.controller;
 
+import net.javaguides.springboot.DTO.UserResponseDTO;
+import net.javaguides.springboot.shared.exception.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,23 +16,20 @@ import net.javaguides.springboot.DTO.UserDTO;
 import net.javaguides.springboot.service.UserService;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:3000")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "*")
 @RequestMapping("api/v1/user")
 public class UserController {
     @Autowired
     private UserService userService;
     
     @PostMapping(path = "/save")
-    public String saveUser(@RequestBody UserDTO userDTO)
-    {
-        String id = userService.addUser(userDTO);
-        return id;
+    public ResponseEntity<ApiResponse<UserResponseDTO>> saveUser(@RequestBody UserDTO userDTO) {
+        return ResponseEntity.ok(userService.addUser(userDTO));
     }
     
     @PostMapping(path = "/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginDTO loginDTO)
-    {
+    public ResponseEntity<?> loginUser(@RequestBody LoginDTO loginDTO) {
         LoginResponse loginResponse = userService.loginUser(loginDTO);
         return ResponseEntity.ok(loginResponse);
     }

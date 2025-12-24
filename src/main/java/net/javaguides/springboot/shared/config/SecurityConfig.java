@@ -11,6 +11,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class SecurityConfig {
+
+    private static final String[] AUTH_WHITELIST = {
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
+    };
+
 	@Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -23,8 +30,9 @@ public class SecurityConfig {
             .and()
             .csrf().disable() // Disable CSRF for simplicity (modify as per your app's needs)
             .authorizeHttpRequests(authorize -> authorize
-//                .requestMatchers("/api/v1/user/**", "/api/v1/employees/**", "api/roles/**", "api/attendance/**", "api/leave-requests/**", "api/employee-attendance/**").permitAll() // Allow access to employee endpoints
-            	.requestMatchers("/**").permitAll()
+                            .requestMatchers(AUTH_WHITELIST).permitAll()
+                            .requestMatchers("/api/v1/user/**", "/api/v1/employees/**", "api/roles/**", "api/attendance/**", "api/leave-requests/**", "api/employee-attendance/**").permitAll() // For local
+//            	.requestMatchers("/**").permitAll() //For cloud
                 .anyRequest().authenticated() // Authenticate all other requests
             );
         
@@ -38,12 +46,12 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-//                        .allowedOrigins("http://localhost:3000") // Allow React frontend
-                		.allowedOrigins("*")
+                        .allowedOrigins("http://localhost:3000") // Allow React frontend
+//                		.allowedOrigins("*") //For Cloud
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-//                        .allowCredentials(true);
-                        .allowCredentials(false);
+                        .allowCredentials(true);
+//                        .allowCredentials(false); //For Cloud
             }
         };
     }
