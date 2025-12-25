@@ -1,4 +1,6 @@
 package net.javaguides.springboot.service;
+import net.javaguides.springboot.DTO.leaverequest.LeaveRequestRequestDTO;
+import net.javaguides.springboot.DTO.leaverequest.LeaveRequestResponseDTO;
 import net.javaguides.springboot.model.LeaveRequest;
 import net.javaguides.springboot.model.Employee;
 import net.javaguides.springboot.repository.EmployeeRepository;
@@ -7,62 +9,91 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LeaveRequestService {
 
     @Autowired
     private LeaveRequestRepository leaveRequestRepository;
+
     @Autowired
     private EmployeeRepository employeeRepository;
-    
-    public List<LeaveRequest> getAllLeaveRequests() {
-        return leaveRequestRepository.findAll();
+
+    public List<LeaveRequestResponseDTO> getAllLeaveRequests() {
+        return leaveRequestRepository.findAll()
+                .stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    public LeaveRequest getLeaveRequestById(Long id) {
-        return leaveRequestRepository.findById(id).orElse(null);
+    public LeaveRequestResponseDTO getLeaveRequestById(Long id) {
+        LeaveRequest leaveRequest = leaveRequestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Leave request not found"));
+        return toResponseDTO(leaveRequest);
     }
 
-    public LeaveRequest createOrUpdateLeaveRequest(LeaveRequest leaveRequest) {
-        return leaveRequestRepository.save(leaveRequest);
+    public List<LeaveRequestResponseDTO> getLeaveRequestsByEmployeeId(Long employeeId) {
+        return leaveRequestRepository.findByEmployeeId(employeeId)
+                .stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    // ---------------- Commands ----------------
+
+    public LeaveRequestResponseDTO applyForLeave(LeaveRequestRequestDTO dto) {
+
+        Employee employee = employeeRepository.findById(dto.getEmployeeId())
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        LeaveRequest leaveRequest = new LeaveRequest();
+        leaveRequest.setEmployee(employee);
+        leaveRequest.setLeaveType(dto.getLeaveType());
+        leaveRequest.setStartDate(dto.getStartDate());
+        leaveRequest.setEndDate(dto.getEndDate());
+        leaveRequest.setReason(dto.getReason());
+        leaveRequest.setStatus("Pending");
+
+        LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+        return toResponseDTO(saved);
+    }
+
+    public LeaveRequestResponseDTO approveLeaveRequest(Long id) {
+        LeaveRequest leaveRequest = getEntity(id);
+        leaveRequest.setStatus("Approved");
+        return toResponseDTO(leaveRequestRepository.save(leaveRequest));
+    }
+
+    public LeaveRequestResponseDTO rejectLeaveRequest(Long id) {
+        LeaveRequest leaveRequest = getEntity(id);
+        leaveRequest.setStatus("Rejected");
+        return toResponseDTO(leaveRequestRepository.save(leaveRequest));
     }
 
     public void deleteLeaveRequest(Long id) {
         leaveRequestRepository.deleteById(id);
     }
 
-    public LeaveRequest approveLeaveRequest(Long id) {
-        LeaveRequest leaveRequest = getLeaveRequestById(id);
-        if (leaveRequest != null) {
-            leaveRequest.setStatus("Approved");
-            leaveRequestRepository.save(leaveRequest);
-        }
-        return leaveRequest;
+    // ---------------- Helpers ----------------
+
+    private LeaveRequest getEntity(Long id) {
+        return leaveRequestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Leave request not found"));
     }
 
-    public LeaveRequest rejectLeaveRequest(Long id) {
-        LeaveRequest leaveRequest = getLeaveRequestById(id);
-        if (leaveRequest != null) {
-            leaveRequest.setStatus("Rejected");
-            leaveRequestRepository.save(leaveRequest);
-        }
-        return leaveRequest;
-    }
-    
-    public LeaveRequest applyForLeave(LeaveRequest leaveRequest) {
-//    	leaveRequest.setStatus("Pending");
-//        return leaveRequestRepository.save(leaveRequest);
-    	
-    	Long employeeId = leaveRequest.getEmployee().getId();
-		Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new RuntimeException("Employee not found"));
-        leaveRequest.setEmployee(employee);
-        leaveRequest.setStatus("Pending");
-        return leaveRequestRepository.save(leaveRequest);
-    }
-    
-    public List<LeaveRequest> getLeaveRequestsByEmployeeId(Long employeeId) {
-        return leaveRequestRepository.findByEmployeeId(employeeId);
+    private LeaveRequestResponseDTO toResponseDTO(LeaveRequest leaveRequest) {
+        return new LeaveRequestResponseDTO(
+                leaveRequest.getId(),
+                leaveRequest.getEmployee().getId(),
+                leaveRequest.getEmployee().getFirstName() + " " +
+                        leaveRequest.getEmployee().getLastName(),
+                leaveRequest.getLeaveType(),
+                leaveRequest.getStartDate(),
+                leaveRequest.getEndDate(),
+                leaveRequest.getReason(),
+                leaveRequest.getStatus()
+        );
     }
 }
 

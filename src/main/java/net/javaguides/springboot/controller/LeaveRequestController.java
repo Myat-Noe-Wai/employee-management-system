@@ -1,5 +1,6 @@
 package net.javaguides.springboot.controller;
-import net.javaguides.springboot.model.LeaveRequest;
+import net.javaguides.springboot.DTO.leaverequest.LeaveRequestRequestDTO;
+import net.javaguides.springboot.DTO.leaverequest.LeaveRequestResponseDTO;
 import net.javaguides.springboot.service.LeaveRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,27 +17,27 @@ public class LeaveRequestController {
     private LeaveRequestService leaveRequestService;
 
     @GetMapping
-    public List<LeaveRequest> getAllLeaveRequests() {
+    public List<LeaveRequestResponseDTO> getAllLeaveRequests() {
         return leaveRequestService.getAllLeaveRequests();
     }
 
     @GetMapping("/{id}")
-    public LeaveRequest getLeaveRequestById(@PathVariable Long id) {
+    public LeaveRequestResponseDTO getLeaveRequestById(@PathVariable Long id) {
         return leaveRequestService.getLeaveRequestById(id);
     }
 
-    @PostMapping
-    public LeaveRequest createLeaveRequest(@RequestBody LeaveRequest leaveRequest) {
-        return leaveRequestService.createOrUpdateLeaveRequest(leaveRequest);
+    @PostMapping("/apply")
+    public LeaveRequestResponseDTO applyForLeave(@RequestBody LeaveRequestRequestDTO dto) {
+        return leaveRequestService.applyForLeave(dto);
     }
 
     @PutMapping("/{id}/approve")
-    public LeaveRequest approveLeaveRequest(@PathVariable Long id) {
+    public LeaveRequestResponseDTO approveLeaveRequest(@PathVariable Long id) {
         return leaveRequestService.approveLeaveRequest(id);
     }
 
     @PutMapping("/{id}/reject")
-    public LeaveRequest rejectLeaveRequest(@PathVariable Long id) {
+    public LeaveRequestResponseDTO rejectLeaveRequest(@PathVariable Long id) {
         return leaveRequestService.rejectLeaveRequest(id);
     }
 
@@ -44,15 +45,10 @@ public class LeaveRequestController {
     public void deleteLeaveRequest(@PathVariable Long id) {
         leaveRequestService.deleteLeaveRequest(id);
     }
-    
-    @PostMapping("/apply")
-    public LeaveRequest applyForLeave(@RequestBody LeaveRequest leaveRequest) {
-        return leaveRequestService.applyForLeave(leaveRequest);
-    }
-    
+
     @GetMapping("/employee/{employeeId}")
-    public List<LeaveRequest> getLeaveRequestsByEmployee(@PathVariable Long employeeId) {
-    	System.out.print("Emp Id " + employeeId);
+    public List<LeaveRequestResponseDTO> getByEmployee(
+            @PathVariable Long employeeId) {
         return leaveRequestService.getLeaveRequestsByEmployeeId(employeeId);
     }
 }

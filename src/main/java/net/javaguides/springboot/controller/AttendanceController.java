@@ -2,37 +2,35 @@ package net.javaguides.springboot.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import net.javaguides.springboot.model.Attendance;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.javaguides.springboot.DTO.attendance.AttendanceRequestDTO;
+import net.javaguides.springboot.DTO.attendance.AttendanceResponseDTO;
+import org.springframework.web.bind.annotation.*;
 import net.javaguides.springboot.service.AttendanceService;
 
 @CrossOrigin(origins = "http://localhost:3000") 
 //@CrossOrigin(origins = "*") //For Cloud
 @RestController
 @RequestMapping("/api/attendance")
+@RequiredArgsConstructor
+@Slf4j
 public class AttendanceController {
-	@Autowired
-	private AttendanceService attendanceService;
-	
-	@GetMapping
-    public List<Attendance> getAllAttendance() {
+    private final AttendanceService attendanceService;
+
+    @GetMapping
+    public List<AttendanceResponseDTO> getAllAttendance() {
         return attendanceService.getAllAttendance();
     }
-	
-	@PostMapping("/clock-in")
-    public Attendance clockIn(@RequestParam Long employeeId, @RequestParam String employeeName) {
-        return attendanceService.clockIn(employeeId, employeeName);
+
+    @PostMapping("/clock-in")
+    public AttendanceResponseDTO clockIn(@RequestBody AttendanceRequestDTO dto) {
+        return attendanceService.clockIn(dto);
     }
 
-    @PostMapping("/clock-out")
-    public Attendance clockOut(@RequestParam Long employeeId) {
+    @PutMapping("/clock-out/{employeeId}")
+    public AttendanceResponseDTO clockOut(@PathVariable Long employeeId) {
+        log.info("clock-out in controller");
         return attendanceService.clockOut(employeeId);
     }
 }
