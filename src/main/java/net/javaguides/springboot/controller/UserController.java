@@ -1,6 +1,6 @@
 package net.javaguides.springboot.controller;
 
-import net.javaguides.springboot.DTO.UserResponseDTO;
+import net.javaguides.springboot.DTO.user.UserResponseDTO;
 import net.javaguides.springboot.shared.exception.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.javaguides.springboot.DTO.LoginDTO;
-import net.javaguides.springboot.DTO.LoginResponse;
-import net.javaguides.springboot.DTO.UserDTO;
+import net.javaguides.springboot.DTO.login.LoginDTO;
+import net.javaguides.springboot.DTO.login.LoginResponse;
+import net.javaguides.springboot.DTO.user.UserDTO;
 import net.javaguides.springboot.service.UserService;
 
 @RestController

@@ -1,4 +1,4 @@
-package net.javaguides.springboot.Impl;
+package net.javaguides.springboot.repository;
 
 import java.util.Optional;
 

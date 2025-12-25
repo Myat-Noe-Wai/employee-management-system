@@ -4,6 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+import net.javaguides.springboot.DTO.employee.EmployeeRequestDTO;
+import net.javaguides.springboot.DTO.employee.EmployeeResponseDTO;
+import net.javaguides.springboot.service.EmployeeService;
+import net.javaguides.springboot.shared.exception.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,51 +27,37 @@ import net.javaguides.springboot.repository.EmployeeRepository;
 @CrossOrigin(origins = "http://localhost:3000")
 //@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/employees")
+@RequiredArgsConstructor
 public class EmployeeController {
-	@Autowired
-	private EmployeeRepository employeeRepository;
-	
-	@GetMapping("/employees")
-	public List<Employee> getAllEmployees(){
-		return employeeRepository.findAll();
+
+	private final EmployeeService employeeService;
+
+	@GetMapping
+	public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployees() {
+		return ResponseEntity.ok(employeeService.getAllEmployees());
 	}
-	
-	@PostMapping("/employees")
-	public Employee createEmployee(@RequestBody Employee employee) {
-		return employeeRepository.save(employee);
+
+	@PostMapping
+	public ResponseEntity<ApiResponse<EmployeeResponseDTO>> createEmployee(@RequestBody EmployeeRequestDTO requestDTO) {
+		return ResponseEntity.ok(employeeService.createEmployee(requestDTO));
 	}
-	
-	@GetMapping("/employees/{id}")
-	public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
-		Employee employee = employeeRepository.findById(id).orElseThrow();
-		return ResponseEntity.ok(employee);
+
+	@GetMapping("/{id}")
+	public ResponseEntity<EmployeeResponseDTO> getEmployeeById(@PathVariable Long id) {
+		return ResponseEntity.ok(employeeService.getEmployeeById(id));
 	}
-	
-	@PutMapping("/employees/{id}")
-	public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee employeeDetails) {
-		Employee employee = employeeRepository.findById(id).orElseThrow();
-		employee.setFirstName(employeeDetails.getFirstName());
-		employee.setLastName(employeeDetails.getLastName());
-		employee.setDateOfBirth(employeeDetails.getDateOfBirth());
-		employee.setEmailId(employeeDetails.getEmailId());
-		employee.setContactInfo(employeeDetails.getContactInfo());
-		employee.setAddress(employeeDetails.getAddress());
-		employee.setGender(employeeDetails.getGender());
-		employee.setJoiningDate(employeeDetails.getJoiningDate());
-		employee.setSalary(employeeDetails.getSalary());
-		employee.setLeaveDay(employeeDetails.getLeaveDay());
-		employee.setRole(employeeDetails.getRole());
-		
-		Employee updatedEmployee = employeeRepository.save(employee);
-		return ResponseEntity.ok(updatedEmployee);
+
+	@PutMapping("/{id}")
+	public ResponseEntity<EmployeeResponseDTO> updateEmployee(
+			@PathVariable Long id,
+			@RequestBody EmployeeRequestDTO requestDTO) {
+		return ResponseEntity.ok(employeeService.updateEmployee(id, requestDTO));
 	}
-	
-	@DeleteMapping("/employees/{id}")
-	public ResponseEntity<Map<String, Boolean>> deleteEmployee(@PathVariable Long id) {
-		Employee employee = employeeRepository.findById(id).orElseThrow();
-		Map<String, Boolean> response= new HashMap<>();
-		response.put("deleted", Boolean.TRUE);
-		return ResponseEntity.ok(response);
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+		employeeService.deleteEmployee(id);
+		return ResponseEntity.noContent().build();
 	}
 }

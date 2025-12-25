@@ -1,4 +1,4 @@
-package net.javaguides.springboot.DTO;
+package net.javaguides.springboot.DTO.login;
 
 public class LoginDTO {
 	private String email;

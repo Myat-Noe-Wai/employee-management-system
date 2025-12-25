@@ -1,4 +1,4 @@
-package net.javaguides.springboot.DTO;
+package net.javaguides.springboot.DTO.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -31,7 +31,7 @@ public class SecurityConfig {
             .csrf().disable() // Disable CSRF for simplicity (modify as per your app's needs)
             .authorizeHttpRequests(authorize -> authorize
                             .requestMatchers(AUTH_WHITELIST).permitAll()
-                            .requestMatchers("/api/v1/user/**", "/api/v1/employees/**", "api/roles/**", "api/attendance/**", "api/leave-requests/**", "api/employee-attendance/**").permitAll() // For local
+                            .requestMatchers("/api/v1/user/**", "/api/v1/employees/**", "api/jobTitles/**", "api/attendance/**", "api/leave-requests/**", "api/employee-attendance/**").permitAll() // For local
 //            	.requestMatchers("/**").permitAll() //For cloud
                 .anyRequest().authenticated() // Authenticate all other requests
             );
