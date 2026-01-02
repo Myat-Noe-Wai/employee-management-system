@@ -1,4 +1,5 @@
 package net.javaguides.springboot.service;
+import lombok.extern.slf4j.Slf4j;
 import net.javaguides.springboot.DTO.leaverequest.LeaveRequestRequestDTO;
 import net.javaguides.springboot.DTO.leaverequest.LeaveRequestResponseDTO;
 import net.javaguides.springboot.model.LeaveRequest;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class LeaveRequestService {
 
     @Autowired
@@ -30,6 +32,7 @@ public class LeaveRequestService {
     public LeaveRequestResponseDTO getLeaveRequestById(Long id) {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Leave request not found"));
+        log.info("got leave request ", leaveRequest);
         return toResponseDTO(leaveRequest);
     }
 

@@ -31,7 +31,8 @@ public class SecurityConfig {
             .csrf().disable() // Disable CSRF for simplicity (modify as per your app's needs)
             .authorizeHttpRequests(authorize -> authorize
                             .requestMatchers(AUTH_WHITELIST).permitAll()
-                            .requestMatchers("/api/v1/user/**", "/api/v1/employees/**", "api/jobTitles/**", "api/attendance/**", "api/leave-requests/**", "/api/attendance/**").permitAll() // For local
+                            .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                            .requestMatchers("/api/v1/user/**", "/api/v1/employees/**", "/api/jobTitles/**", "/api/attendance/**", "/api/leave-requests/**").permitAll() // For local
 //            	.requestMatchers("/**").permitAll() //For cloud
                 .anyRequest().authenticated() // Authenticate all other requests
             );

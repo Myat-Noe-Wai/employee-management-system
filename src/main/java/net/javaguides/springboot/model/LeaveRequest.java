@@ -1,16 +1,12 @@
 package net.javaguides.springboot.model;
 
+import java.time.LocalDate;
 import java.util.Date;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import net.javaguides.springboot.enums.LeaveType;
 
 @Entity
 @Table(name = "leave_request")
@@ -25,10 +21,12 @@ public class LeaveRequest {
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    private String leaveType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private LeaveType leaveType;
 
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String reason;
     private String status;
 }
