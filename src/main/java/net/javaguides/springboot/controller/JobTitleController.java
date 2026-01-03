@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import net.javaguides.springboot.service.JobTitleService;
 
-@CrossOrigin(origins = "http://localhost:3000")
-//@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/jobTitles")
 @RequiredArgsConstructor

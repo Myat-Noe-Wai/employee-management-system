@@ -32,8 +32,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
                             .requestMatchers(AUTH_WHITELIST).permitAll()
                             .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-                            .requestMatchers("/api/v1/user/**", "/api/v1/employees/**", "/api/jobTitles/**", "/api/attendance/**", "/api/leave-requests/**").permitAll() // For local
-//            	.requestMatchers("/**").permitAll() //For cloud
+//                            .requestMatchers("/api/v1/user/**", "/api/v1/employees/**", "/api/jobTitles/**", "/api/attendance/**", "/api/leave-requests/**").permitAll() // For local
+            	.requestMatchers("/**").permitAll() //For cloud
                 .anyRequest().authenticated() // Authenticate all other requests
             );
         
@@ -47,12 +47,12 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:3000") // Allow React frontend
-//                		.allowedOrigins("*") //For Cloud
+//                        .allowedOrigins("http://localhost:3000") // Allow React frontend
+                		.allowedOrigins("*") //For Cloud
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-                        .allowCredentials(true);
-//                        .allowCredentials(false); //For Cloud
+//                        .allowCredentials(true);
+                        .allowCredentials(false); //For Cloud
             }
         };
     }

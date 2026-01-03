@@ -36,6 +36,7 @@ The **Employee Management System** is a full-stack web application designed to s
 ### 🔹 Demo Access
 
 * **Project URL:** [http://13.61.161.105/login](http://13.61.161.105/login)
+* **Swagger API Docs:** http://13.61.161.105:8081/swagger-ui/index.html
 
 **Admin Account**
 
