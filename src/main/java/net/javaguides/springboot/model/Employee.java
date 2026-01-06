@@ -2,12 +2,7 @@ package net.javaguides.springboot.model;
 
 import java.util.Date;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -51,4 +46,8 @@ public class Employee {
 	private int leaveDay;
 
 	private String jobTitle;
+
+	@OneToOne
+	@JoinColumn(name = "user_id", unique = true)
+	private User user;
 }

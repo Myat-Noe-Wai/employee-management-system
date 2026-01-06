@@ -42,8 +42,12 @@ public class AttendanceService {
                                 .build()
                 );
 
-        attendance.setClockIn(LocalDateTime.now());
+        if (attendance.getClockIn() != null) {
+            // Employee already clocked in
+            return AttendanceResponseDTO.alreadyLoggedIn(attendance);
+        }
 
+        attendance.setClockIn(LocalDateTime.now());
         Attendance saved = attendanceRepository.save(attendance);
         return mapToResponse(saved);
     }
@@ -55,9 +59,14 @@ public class AttendanceService {
         Attendance attendance = attendanceRepository.findByDateAndEmployeeId(today, employeeId)
                 .orElseThrow(() -> new GeneralException("Attendance record not found"));
 
-        attendance.setClockOut(LocalDateTime.now());
+        // Check if already clocked out
+        if (attendance.getClockOut() != null) {
+            return AttendanceResponseDTO.alreadyLoggedOut(attendance);
+        }
 
+        attendance.setClockOut(LocalDateTime.now());
         Attendance saved = attendanceRepository.save(attendance);
+
         return mapToResponse(saved);
     }
 
@@ -70,7 +79,8 @@ public class AttendanceService {
                 attendance.getEmployeeName(),
                 attendance.getDate(),
                 attendance.getClockIn(),
-                attendance.getClockOut()
+                attendance.getClockOut(),
+                null
         );
     }
 }

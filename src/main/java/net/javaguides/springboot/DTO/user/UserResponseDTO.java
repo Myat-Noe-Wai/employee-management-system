@@ -8,10 +8,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class UserResponseDTO {
-
-    private int userId;
+    private Long userId;
     private String username;
     private String email;
     private String role;
+    private String accessToken;
 }
 

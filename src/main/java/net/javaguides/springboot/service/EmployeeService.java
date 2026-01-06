@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import net.javaguides.springboot.DTO.employee.EmployeeRequestDTO;
 import net.javaguides.springboot.DTO.employee.EmployeeResponseDTO;
+import net.javaguides.springboot.model.User;
+import net.javaguides.springboot.repository.UserRepo;
 import net.javaguides.springboot.shared.exception.ApiResponse;
 import net.javaguides.springboot.shared.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import net.javaguides.springboot.repository.EmployeeRepository;
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final UserRepo userRepo;
 
     public List<EmployeeResponseDTO> getAllEmployees() {
         return employeeRepository.findAll()
@@ -69,6 +72,8 @@ public class EmployeeService {
     // ---------- Mapping Methods ----------
 
     private Employee mapToEntity(EmployeeRequestDTO dto) {
+        User user = userRepo.findById(dto.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User", dto.getUserId()));
         Employee employee = new Employee();
         employee.setFirstName(dto.getFirstName());
         employee.setLastName(dto.getLastName());
@@ -81,6 +86,7 @@ public class EmployeeService {
         employee.setSalary(dto.getSalary());
         employee.setLeaveDay(dto.getLeaveDay());
         employee.setJobTitle(dto.getJobTitle());
+        employee.setUser(user);
         return employee;
     }
 
