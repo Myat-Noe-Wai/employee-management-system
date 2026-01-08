@@ -4,16 +4,14 @@ import net.javaguides.springboot.DTO.user.UserResponseDTO;
 import net.javaguides.springboot.shared.exception.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import net.javaguides.springboot.DTO.login.LoginDTO;
-import net.javaguides.springboot.DTO.login.LoginResponse;
+import net.javaguides.springboot.DTO.login.LoginResponseDTO;
 import net.javaguides.springboot.DTO.user.UserDTO;
 import net.javaguides.springboot.service.UserService;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -30,7 +28,13 @@ public class UserController {
     
     @PostMapping(path = "/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginDTO loginDTO) {
-        LoginResponse loginResponse = userService.loginUser(loginDTO);
-        return ResponseEntity.ok(loginResponse);
+        LoginResponseDTO loginResponseDTO = userService.loginUser(loginDTO);
+        return ResponseEntity.ok(loginResponseDTO);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        List<UserResponseDTO> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 }

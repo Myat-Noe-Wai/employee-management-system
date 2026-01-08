@@ -37,7 +37,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
                             .requestMatchers(AUTH_WHITELIST).permitAll()
                             .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-                            .requestMatchers("/api/v1/user/**", "/api/v1/employees/**", "/api/jobTitles/**", "/api/leave-requests/**").permitAll() // For local
+                            .requestMatchers("/api/v1/user/**").permitAll() // For local
 //            	.requestMatchers("/**").permitAll() //For cloud
                 .anyRequest().authenticated() // Authenticate all other requests
             )

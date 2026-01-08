@@ -1,8 +1,10 @@
 package net.javaguides.springboot.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import net.javaguides.springboot.DTO.employee.EmployeeRequestDTO;
 import net.javaguides.springboot.DTO.employee.EmployeeResponseDTO;
 import net.javaguides.springboot.model.User;
@@ -17,6 +19,7 @@ import net.javaguides.springboot.repository.EmployeeRepository;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
@@ -30,7 +33,12 @@ public class EmployeeService {
     }
 
     public ApiResponse<EmployeeResponseDTO> createEmployee(EmployeeRequestDTO dto) {
+        User user = userRepo.findById(dto.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User", dto.getUserId()));
+
         Employee employee = mapToEntity(dto);
+        employee.setUser(user);
+
         Employee saved = employeeRepository.save(employee);
         EmployeeResponseDTO mappedEmployee = mapToResponse(saved);
 
@@ -59,7 +67,10 @@ public class EmployeeService {
         employee.setLeaveDay(dto.getLeaveDay());
         employee.setJobTitle(dto.getJobTitle());
 
+        log.info("Job Title: {} ", dto.getJobTitle());
         Employee updated = employeeRepository.save(employee);
+        log.info("Employee details updated successfully: {}", updated);
+
         return mapToResponse(updated);
     }
 

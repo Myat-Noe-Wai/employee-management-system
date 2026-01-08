@@ -1,5 +1,7 @@
 package net.javaguides.springboot.Impl;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import net.javaguides.springboot.DTO.user.UserResponseDTO;
 import net.javaguides.springboot.repository.UserRepo;
@@ -9,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import net.javaguides.springboot.DTO.login.LoginDTO;
-import net.javaguides.springboot.DTO.login.LoginResponse;
+import net.javaguides.springboot.DTO.login.LoginResponseDTO;
 import net.javaguides.springboot.DTO.user.UserDTO;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.service.UserService;
@@ -47,63 +49,44 @@ public class UserImpl implements UserService{
         return ApiResponse.success("User registered successfully", responseDTO);
     }
 
-//    UserDTO userDTO;
-//    @Override
-//    public LoginResponse loginUser(LoginDTO loginDTO) {
-//        String msg = "";
-//        User user1 = userRepo.findByEmail(loginDTO.getEmail());
-//        if (user1 != null) {
-//            String password = loginDTO.getPassword();
-//            String encodedPassword = user1.getPassword();
-//            Boolean isPwdRight = passwordEncoder.matches(password, encodedPassword);
-////            Boolean isPwdRight = false;
-//            if(password.equals(user1.getPassword())) {
-//            	isPwdRight = true;
-//            }
-//            if (isPwdRight) {
-//                Optional<User> user = userRepo.findOneByEmailAndPassword(loginDTO.getEmail(), encodedPassword);
-//                if (user.isPresent()) {
-//                	System.out.println("Role " + user1.getRole());
-//                	if(user1.getRole().equals("admin")) {
-//                		return new LoginResponse("Admin Login Success", true, user1.getUserId(), user1.getUsername());
-//                	} else {
-//                		System.out.print("emp login");
-//                		return new LoginResponse("Employee Login Success", true, user1.getUserId(), user1.getUsername());
-//                	}
-//                } else {
-//                    return new LoginResponse("Login Failed", false);
-//                }
-//            } else {
-//                return new LoginResponse("password Not Match", false);
-//            }
-//        }else {
-//            return new LoginResponse("Email not exits", false);
-//        }
-//    }
-
     @Override
-    public LoginResponse loginUser(LoginDTO loginDTO) {
-
+    public LoginResponseDTO loginUser(LoginDTO loginDTO) {
         Optional<User> optionalUser = userRepo.findByEmail(loginDTO.getEmail());
-
         if (optionalUser.isEmpty()) {
-            return new LoginResponse("Email not exists", false);
+            return new LoginResponseDTO("Email not exists", false);
         }
 
         User user = optionalUser.get(); // ✅ unwrap Optional
-
         if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-            return new LoginResponse("Invalid password", false);
+            return new LoginResponseDTO("Invalid password", false);
         }
 
         String accessToken = jwtUtil.generateToken(user.getEmail());
 
-        return new LoginResponse(
+        return new LoginResponseDTO(
                 "Login success",
                 true,
                 user.getUserId(),
                 user.getUsername(),
+                user.getRole(),
                 accessToken
         );
+    }
+
+    @Override
+    public List<UserResponseDTO> getAllUsers() {
+        // Fetch all users from DB
+        List<User> users = userRepo.findAll();
+
+        // Map to UserResponseDTO (without token)
+        return users.stream()
+                .map(user -> new UserResponseDTO(
+                        user.getUserId(),
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getRole(),
+                        null // token is null when fetching users
+                ))
+                .collect(Collectors.toList());
     }
 }

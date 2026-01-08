@@ -6,6 +6,7 @@ import net.javaguides.springboot.model.LeaveRequest;
 import net.javaguides.springboot.model.Employee;
 import net.javaguides.springboot.repository.EmployeeRepository;
 import net.javaguides.springboot.repository.LeaveRequestRepository;
+import net.javaguides.springboot.shared.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +49,7 @@ public class LeaveRequestService {
     public LeaveRequestResponseDTO applyForLeave(LeaveRequestRequestDTO dto) {
 
         Employee employee = employeeRepository.findById(dto.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", dto.getEmployeeId()));
 
         LeaveRequest leaveRequest = new LeaveRequest();
         leaveRequest.setEmployee(employee);

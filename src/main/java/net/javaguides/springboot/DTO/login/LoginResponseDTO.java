@@ -9,23 +9,25 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResponse {
+public class LoginResponseDTO {
 	private Long id;
 	private Boolean status;
-	private String empName;
+	private String userName;
+	private String role;
 	private String message;
 	private String accessToken;
 
-	public LoginResponse(String message, Boolean status) {
+	public LoginResponseDTO(String message, Boolean status) {
 		this.message = message;
 		this.status = status;
 	}
 
-	public LoginResponse(String message, Boolean status, Long id, String empName, String accessToken) {
+	public LoginResponseDTO(String message, Boolean status, Long id, String userName, String role, String accessToken) {
 		this.message = message;
 		this.status = status;
 		this.id = id;
-		this.empName = empName;
+		this.userName = userName;
+		this.role = role;
 		this.accessToken = accessToken;
 	}
 }
