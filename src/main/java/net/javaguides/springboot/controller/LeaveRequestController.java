@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
-//@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/leave-requests")
 public class LeaveRequestController {
@@ -46,10 +46,9 @@ public class LeaveRequestController {
         leaveRequestService.deleteLeaveRequest(id);
     }
 
-    @GetMapping("/employee/{employeeId}")
-    public List<LeaveRequestResponseDTO> getByEmployee(
-            @PathVariable Long employeeId) {
-        return leaveRequestService.getLeaveRequestsByEmployeeId(employeeId);
+    @GetMapping("/my")
+    public List<LeaveRequestResponseDTO> getMyLeaveRequests() {
+        return leaveRequestService.getMyLeaveRequests();
     }
 }
 

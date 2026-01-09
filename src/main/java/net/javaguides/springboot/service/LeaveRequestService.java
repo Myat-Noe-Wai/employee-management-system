@@ -6,8 +6,10 @@ import net.javaguides.springboot.model.LeaveRequest;
 import net.javaguides.springboot.model.Employee;
 import net.javaguides.springboot.repository.EmployeeRepository;
 import net.javaguides.springboot.repository.LeaveRequestRepository;
+import net.javaguides.springboot.shared.exception.GeneralException;
 import net.javaguides.springboot.shared.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,8 +39,18 @@ public class LeaveRequestService {
         return toResponseDTO(leaveRequest);
     }
 
-    public List<LeaveRequestResponseDTO> getLeaveRequestsByEmployeeId(Long employeeId) {
-        return leaveRequestRepository.findByEmployeeId(employeeId)
+    public List<LeaveRequestResponseDTO> getMyLeaveRequests() {
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        Employee employee = employeeRepository
+                .findByUser_Email(email)
+                .orElseThrow(() ->
+                        new GeneralException("Employee not found for logged-in user"));
+
+        return leaveRequestRepository.findByEmployeeId(employee.getId())
                 .stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
@@ -48,8 +60,13 @@ public class LeaveRequestService {
 
     public LeaveRequestResponseDTO applyForLeave(LeaveRequestRequestDTO dto) {
 
-        Employee employee = employeeRepository.findById(dto.getEmployeeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", dto.getEmployeeId()));
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        Employee employee = employeeRepository.findByUser_Email(email).orElseThrow(() ->
+                        new GeneralException("User not found with this email"));
 
         LeaveRequest leaveRequest = new LeaveRequest();
         leaveRequest.setEmployee(employee);

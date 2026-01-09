@@ -9,8 +9,8 @@ import net.javaguides.springboot.DTO.attendance.AttendanceResponseDTO;
 import org.springframework.web.bind.annotation.*;
 import net.javaguides.springboot.service.AttendanceService;
 
-@CrossOrigin(origins = "http://localhost:3000")
-//@CrossOrigin(origins = "*") //For Cloud
+//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*") //For Cloud
 @RestController
 @RequestMapping("/api/attendance")
 @RequiredArgsConstructor
