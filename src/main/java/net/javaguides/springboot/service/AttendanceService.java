@@ -70,6 +70,13 @@ public class AttendanceService {
         return mapToResponse(saved);
     }
 
+    public List<AttendanceResponseDTO> getAttendanceByEmployee(Long employeeId) {
+        return attendanceRepository.findByEmployeeId(employeeId)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     // -------- Mapping --------
 
     private AttendanceResponseDTO mapToResponse(Attendance attendance) {

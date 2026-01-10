@@ -33,4 +33,9 @@ public class AttendanceController {
         log.info("clock-out in controller");
         return attendanceService.clockOut(employeeId);
     }
+
+    @GetMapping("/employee/{employeeId}")
+    public List<AttendanceResponseDTO> getAttendanceByEmployee(@PathVariable Long employeeId) {
+        return attendanceService.getAttendanceByEmployee(employeeId);
+    }
 }

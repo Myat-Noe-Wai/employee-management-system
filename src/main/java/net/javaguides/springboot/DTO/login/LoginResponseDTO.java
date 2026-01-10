@@ -13,6 +13,7 @@ public class LoginResponseDTO {
 	private Long id;
 	private Boolean status;
 	private String userName;
+	private String email;
 	private String role;
 	private String message;
 	private String accessToken;
@@ -22,11 +23,12 @@ public class LoginResponseDTO {
 		this.status = status;
 	}
 
-	public LoginResponseDTO(String message, Boolean status, Long id, String userName, String role, String accessToken) {
+	public LoginResponseDTO(String message, Boolean status, Long id, String userName, String email, String role, String accessToken) {
 		this.message = message;
 		this.status = status;
 		this.id = id;
 		this.userName = userName;
+		this.email = email;
 		this.role = role;
 		this.accessToken = accessToken;
 	}

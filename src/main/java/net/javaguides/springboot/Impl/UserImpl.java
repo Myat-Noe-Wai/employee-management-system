@@ -68,6 +68,7 @@ public class UserImpl implements UserService{
                 true,
                 user.getUserId(),
                 user.getUsername(),
+                user.getEmail(),
                 user.getRole(),
                 accessToken
         );
