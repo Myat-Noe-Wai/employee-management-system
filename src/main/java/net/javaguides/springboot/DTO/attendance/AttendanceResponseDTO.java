@@ -2,7 +2,9 @@ package net.javaguides.springboot.DTO.attendance;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.javaguides.springboot.model.Attendance;
@@ -14,8 +16,17 @@ public class AttendanceResponseDTO {
     private Long employeeId;
     private String employeeName;
     private LocalDate date;
-    private LocalDateTime clockIn;
-    private LocalDateTime clockOut;
+
+    @JsonFormat(
+            shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd HH:mm:ss XXX"
+    )
+    private OffsetDateTime clockIn;
+    @JsonFormat(
+            shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd HH:mm:ss XXX"
+    )
+    private OffsetDateTime clockOut;
     private String message;
 
     // Static factory for "already logged in"

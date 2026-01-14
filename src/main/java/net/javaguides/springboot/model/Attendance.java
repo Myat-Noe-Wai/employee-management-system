@@ -1,7 +1,7 @@
 package net.javaguides.springboot.model;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +23,6 @@ public class Attendance {
 	private String employeeName;
 
 	private LocalDate date;
-	private LocalDateTime clockIn;
-	private LocalDateTime clockOut;
+	private OffsetDateTime clockIn;
+	private OffsetDateTime clockOut;
 }

@@ -2,6 +2,8 @@ package net.javaguides.springboot.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,32 +25,70 @@ public class AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
 
-    public List<AttendanceResponseDTO> getAllAttendance() {
-        return attendanceRepository.findAll()
-                .stream()
+    public List<AttendanceResponseDTO> getAllAttendance(Long employeeId, LocalDate fromDate, LocalDate toDate) {
+        List<Attendance> list;
+
+        // 1️⃣ Default → today
+        if (employeeId == null && fromDate == null && toDate == null) {
+            list = attendanceRepository.findByDate(LocalDate.now());
+        }
+        // 2️⃣ Employee + date range
+        else if (employeeId != null && fromDate != null && toDate != null) {
+            list = attendanceRepository
+                    .findByEmployeeIdAndDateBetween(employeeId, fromDate, toDate);
+        }
+        // 3️⃣ Date range only
+        else if (fromDate != null && toDate != null) {
+            list = attendanceRepository.findByDateBetween(fromDate, toDate);
+        }
+        // 4️⃣ Employee only
+        else if (employeeId != null) {
+            list = attendanceRepository.findByEmployeeId(employeeId);
+        }
+        else {
+            list = attendanceRepository.findAll();
+        }
+
+        return list.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     public AttendanceResponseDTO clockIn(AttendanceRequestDTO dto) {
-        LocalDate today = LocalDate.now();
 
-        Attendance attendance = attendanceRepository.findByDateAndEmployeeId(today, dto.getEmployeeId())
-                .orElse(
-                        Attendance.builder()
-                                .employeeId(dto.getEmployeeId())
-                                .employeeName(dto.getEmployeeName())
-                                .date(today)
-                                .build()
-                );
+        log.info("Clock-in request received for employeeId={}, employeeName={}",
+                dto.getEmployeeId(), dto.getEmployeeName());
+
+        LocalDate today = LocalDate.now();
+        log.debug("Processing clock-in for date={}", today);
+
+        Attendance attendance = attendanceRepository
+                .findByDateAndEmployeeId(today, dto.getEmployeeId())
+                .orElseGet(() -> {
+                    log.info("No attendance record found for employeeId={} on date={}, creating new record",
+                            dto.getEmployeeId(), today);
+
+                    return Attendance.builder()
+                            .employeeId(dto.getEmployeeId())
+                            .employeeName(dto.getEmployeeName())
+                            .date(today)
+                            .build();
+                });
 
         if (attendance.getClockIn() != null) {
-            // Employee already clocked in
+            log.warn("Employee already clocked in. employeeId={}, clockInTime={}",
+                    dto.getEmployeeId(), attendance.getClockIn());
+
             return AttendanceResponseDTO.alreadyLoggedIn(attendance);
         }
 
-        attendance.setClockIn(LocalDateTime.now());
+        attendance.setClockIn(OffsetDateTime.now(ZoneId.of("Asia/Yangon")));
+        log.info("Clock-in successful. employeeId={}, clockInTime={}",
+                dto.getEmployeeId(), OffsetDateTime.now(ZoneId.of("Asia/Yangon")));
+
         Attendance saved = attendanceRepository.save(attendance);
+        log.debug("Attendance record saved successfully. attendanceId={}", saved.getId());
+
         return mapToResponse(saved);
     }
 
@@ -64,7 +104,7 @@ public class AttendanceService {
             return AttendanceResponseDTO.alreadyLoggedOut(attendance);
         }
 
-        attendance.setClockOut(LocalDateTime.now());
+        attendance.setClockOut(OffsetDateTime.now(ZoneId.of("Asia/Yangon")));
         Attendance saved = attendanceRepository.save(attendance);
 
         return mapToResponse(saved);
