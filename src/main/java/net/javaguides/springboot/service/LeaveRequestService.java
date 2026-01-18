@@ -1,5 +1,6 @@
 package net.javaguides.springboot.service;
 import lombok.extern.slf4j.Slf4j;
+import net.javaguides.springboot.DTO.leaverequest.LeaveBalanceResponse;
 import net.javaguides.springboot.DTO.leaverequest.LeaveRequestRequestDTO;
 import net.javaguides.springboot.DTO.leaverequest.LeaveRequestResponseDTO;
 import net.javaguides.springboot.model.LeaveRequest;
@@ -40,10 +41,7 @@ public class LeaveRequestService {
     }
 
     public List<LeaveRequestResponseDTO> getMyLeaveRequests() {
-        String email = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Employee employee = employeeRepository
                 .findByUser_Email(email)
@@ -57,13 +55,9 @@ public class LeaveRequestService {
     }
 
     // ---------------- Commands ----------------
-
     public LeaveRequestResponseDTO applyForLeave(LeaveRequestRequestDTO dto) {
 
-        String email = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Employee employee = employeeRepository.findByUser_Email(email).orElseThrow(() ->
                         new GeneralException("User not found with this email"));
@@ -94,6 +88,22 @@ public class LeaveRequestService {
 
     public void deleteLeaveRequest(Long id) {
         leaveRequestRepository.deleteById(id);
+    }
+
+    public LeaveBalanceResponse getLeaveBalance(Long employeeId) {
+        log.info("Fetching leave balance for employeeId={}", employeeId);
+
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> {
+                    log.error("Employee not found with id={}", employeeId);
+                    return new GeneralException("Employee not found");
+                });
+        int totalDays = employee.getLeaveDay();
+        int usedDays = leaveRequestRepository.countApprovedLeaves(employeeId);
+
+        int remaining = totalDays - usedDays;
+
+        return new LeaveBalanceResponse(totalDays, usedDays, remaining);
     }
 
     // ---------------- Helpers ----------------

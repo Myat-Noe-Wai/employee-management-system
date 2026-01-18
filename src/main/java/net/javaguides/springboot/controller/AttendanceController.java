@@ -44,4 +44,19 @@ public class AttendanceController {
     public List<AttendanceResponseDTO> getAttendanceByEmployee(@PathVariable Long employeeId) {
         return attendanceService.getAttendanceByEmployee(employeeId);
     }
+
+    @GetMapping("/today")
+    public AttendanceResponseDTO getTodayAttendance(@RequestParam Long employeeId) {
+        return attendanceService.getTodayAttendance(employeeId);
+    }
+
+    @GetMapping("/last")
+    public AttendanceResponseDTO getLastAttendance(@RequestParam Long employeeId) {
+        return attendanceService.getLastAttendance(employeeId);
+    }
+
+    @GetMapping("/my/month")
+    public List<AttendanceResponseDTO> getMyMonthlyAttendance(@RequestParam String month, @RequestParam Long employeeId) {
+        return attendanceService.getMyMonthlyAttendance(employeeId, month);
+    }
 }

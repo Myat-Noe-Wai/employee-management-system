@@ -24,4 +24,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
 			LocalDate from,
 			LocalDate to
 	);
+
+	Optional<Attendance> findTopByEmployeeIdOrderByDateDesc(Long employeeId);
 }

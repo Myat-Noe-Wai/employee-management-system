@@ -1,9 +1,6 @@
 package net.javaguides.springboot.service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -117,8 +114,42 @@ public class AttendanceService {
                 .collect(Collectors.toList());
     }
 
-    // -------- Mapping --------
+    public AttendanceResponseDTO getTodayAttendance(Long employeeId) {
+        LocalDate today = LocalDate.now();
+        log.info("Fetching today's attendance for employeeId={} on date={}", employeeId, today);
 
+        Attendance todayAttendance = attendanceRepository.findByDateAndEmployeeId(today, employeeId)
+                .orElseThrow(() -> {
+                    log.warn("No attendance record found for employeeId={} on date={}", employeeId, today);
+                    return new GeneralException("Today attendance not found");
+                });
+
+        log.info("Attendance found for employeeId={} | clockIn={} | clockOut={}",
+                employeeId, todayAttendance.getClockIn(), todayAttendance.getClockOut());
+
+        return mapToResponse(todayAttendance);
+    }
+
+    public AttendanceResponseDTO getLastAttendance(Long employeeId) {
+        return attendanceRepository
+                .findTopByEmployeeIdOrderByDateDesc(employeeId)
+                .map(this::mapToResponse)
+                .orElse(null);
+    }
+
+    public List<AttendanceResponseDTO> getMyMonthlyAttendance(Long employeeId, String month) {
+        YearMonth yearMonth = YearMonth.parse(month); // 2026-01
+        LocalDate start = yearMonth.atDay(1);
+        LocalDate end = yearMonth.atEndOfMonth();
+
+        return attendanceRepository
+                .findByEmployeeIdAndDateBetween(employeeId, start, end)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    // -------- Mapping --------
     private AttendanceResponseDTO mapToResponse(Attendance attendance) {
         return new AttendanceResponseDTO(
                 attendance.getId(),

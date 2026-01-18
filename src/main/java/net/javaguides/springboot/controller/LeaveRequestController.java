@@ -1,4 +1,5 @@
 package net.javaguides.springboot.controller;
+import net.javaguides.springboot.DTO.leaverequest.LeaveBalanceResponse;
 import net.javaguides.springboot.DTO.leaverequest.LeaveRequestRequestDTO;
 import net.javaguides.springboot.DTO.leaverequest.LeaveRequestResponseDTO;
 import net.javaguides.springboot.service.LeaveRequestService;
@@ -49,6 +50,11 @@ public class LeaveRequestController {
     @GetMapping("/my")
     public List<LeaveRequestResponseDTO> getMyLeaveRequests() {
         return leaveRequestService.getMyLeaveRequests();
+    }
+
+    @GetMapping("/leave-balance")
+    public LeaveBalanceResponse getLeaveBalance(@RequestParam Long employeeId) {
+        return leaveRequestService.getLeaveBalance(employeeId);
     }
 }
 
