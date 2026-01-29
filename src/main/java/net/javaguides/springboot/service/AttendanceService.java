@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import net.javaguides.springboot.model.Employee;
+import net.javaguides.springboot.repository.EmployeeRepository;
 import net.javaguides.springboot.shared.exception.GeneralException;
 import net.javaguides.springboot.shared.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ import net.javaguides.springboot.repository.AttendanceRepository;
 public class AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
+
+    private final EmployeeRepository employeeRepository;
 
     public List<AttendanceResponseDTO> getAllAttendance(Long employeeId, LocalDate fromDate, LocalDate toDate) {
         List<Attendance> list;
@@ -54,19 +58,27 @@ public class AttendanceService {
     public AttendanceResponseDTO clockIn(AttendanceRequestDTO dto) {
 
         log.info("Clock-in request received for employeeId={}, employeeName={}",
-                dto.getEmployeeId(), dto.getEmployeeName());
+                dto.getUserId(), dto.getEmployeeName());
+        log.info("Clock-in request received for userId={}", dto.getUserId());
+
+        // 🔑 Resolve employee from userId
+        Employee employee = employeeRepository
+                .findByUser_UserId(dto.getUserId())
+                .orElseThrow(() ->
+                        new RuntimeException("Employee not found for userId=" + dto.getUserId())
+                );
 
         LocalDate today = LocalDate.now();
         log.debug("Processing clock-in for date={}", today);
 
         Attendance attendance = attendanceRepository
-                .findByDateAndEmployeeId(today, dto.getEmployeeId())
+                .findByDateAndEmployeeId(today, employee.getId())
                 .orElseGet(() -> {
                     log.info("No attendance record found for employeeId={} on date={}, creating new record",
-                            dto.getEmployeeId(), today);
+                            employee.getId(), today);
 
                     return Attendance.builder()
-                            .employeeId(dto.getEmployeeId())
+                            .employeeId(employee.getId())
                             .employeeName(dto.getEmployeeName())
                             .date(today)
                             .build();
@@ -74,14 +86,14 @@ public class AttendanceService {
 
         if (attendance.getClockIn() != null) {
             log.warn("Employee already clocked in. employeeId={}, clockInTime={}",
-                    dto.getEmployeeId(), attendance.getClockIn());
+                    dto.getUserId(), attendance.getClockIn());
 
             return AttendanceResponseDTO.alreadyLoggedIn(attendance);
         }
 
         attendance.setClockIn(OffsetDateTime.now(ZoneId.of("Asia/Yangon")));
         log.info("Clock-in successful. employeeId={}, clockInTime={}",
-                dto.getEmployeeId(), OffsetDateTime.now(ZoneId.of("Asia/Yangon")));
+                dto.getUserId(), OffsetDateTime.now(ZoneId.of("Asia/Yangon")));
 
         Attendance saved = attendanceRepository.save(attendance);
         log.debug("Attendance record saved successfully. attendanceId={}", saved.getId());
@@ -89,11 +101,14 @@ public class AttendanceService {
         return mapToResponse(saved);
     }
 
-    public AttendanceResponseDTO clockOut(Long employeeId) {
+    public AttendanceResponseDTO clockOut(Long userId) {
         log.info("clock-out in Service");
+        // 🔑 Resolve employee from userId
+        Employee employee = employeeRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new RuntimeException("Employee not found for userId=" + userId));
         LocalDate today = LocalDate.now();
 
-        Attendance attendance = attendanceRepository.findByDateAndEmployeeId(today, employeeId)
+        Attendance attendance = attendanceRepository.findByDateAndEmployeeId(today, employee.getId())
                 .orElseThrow(() -> new GeneralException("Attendance record not found"));
 
         // Check if already clocked out
@@ -107,43 +122,60 @@ public class AttendanceService {
         return mapToResponse(saved);
     }
 
-    public List<AttendanceResponseDTO> getAttendanceByEmployee(Long employeeId) {
-        return attendanceRepository.findByEmployeeId(employeeId)
+    public List<AttendanceResponseDTO> getAttendanceByEmployee(Long userId) {
+        // 🔑 Resolve employee from userId
+        Employee employee = employeeRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new RuntimeException("Employee not found for userId=" + userId));
+        LocalDate today = LocalDate.now();
+
+        return attendanceRepository.findByEmployeeId(employee.getId())
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
-    public AttendanceResponseDTO getTodayAttendance(Long employeeId) {
-        LocalDate today = LocalDate.now();
-        log.info("Fetching today's attendance for employeeId={} on date={}", employeeId, today);
+    public AttendanceResponseDTO getTodayAttendance(Long userId) {
+        // 🔑 Resolve employee from userId
+        Employee employee = employeeRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new RuntimeException("Employee not found for userId=" + userId));
 
-        Attendance todayAttendance = attendanceRepository.findByDateAndEmployeeId(today, employeeId)
+        LocalDate today = LocalDate.now();
+        log.info("Fetching today's attendance for employeeId={} on date={}", employee.getId(), today);
+
+        Attendance todayAttendance = attendanceRepository.findByDateAndEmployeeId(today, employee.getId())
                 .orElseThrow(() -> {
-                    log.warn("No attendance record found for employeeId={} on date={}", employeeId, today);
+                    log.warn("No attendance record found for employeeId={} on date={}", employee.getId(), today);
                     return new GeneralException("Today attendance not found");
                 });
 
         log.info("Attendance found for employeeId={} | clockIn={} | clockOut={}",
-                employeeId, todayAttendance.getClockIn(), todayAttendance.getClockOut());
+                employee.getId(), todayAttendance.getClockIn(), todayAttendance.getClockOut());
 
         return mapToResponse(todayAttendance);
     }
 
-    public AttendanceResponseDTO getLastAttendance(Long employeeId) {
+    public AttendanceResponseDTO getLastAttendance(Long userId) {
+        // 🔑 Resolve employee from userId
+        Employee employee = employeeRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new RuntimeException("Employee not found for userId=" + userId));
+
         return attendanceRepository
-                .findTopByEmployeeIdOrderByDateDesc(employeeId)
+                .findTopByEmployeeIdOrderByDateDesc(employee.getId())
                 .map(this::mapToResponse)
                 .orElse(null);
     }
 
-    public List<AttendanceResponseDTO> getMyMonthlyAttendance(Long employeeId, String month) {
+    public List<AttendanceResponseDTO> getMyMonthlyAttendance(Long userId, String month) {
+        // 🔑 Resolve employee from userId
+        Employee employee = employeeRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new RuntimeException("Employee not found for userId = " + userId));
+
         YearMonth yearMonth = YearMonth.parse(month); // 2026-01
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
 
         return attendanceRepository
-                .findByEmployeeIdAndDateBetween(employeeId, start, end)
+                .findByEmployeeIdAndDateBetween(employee.getId(), start, end)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();

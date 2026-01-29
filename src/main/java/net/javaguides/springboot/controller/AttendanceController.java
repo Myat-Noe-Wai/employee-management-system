@@ -34,29 +34,29 @@ public class AttendanceController {
         return attendanceService.clockIn(dto);
     }
 
-    @PutMapping("/clock-out/{employeeId}")
-    public AttendanceResponseDTO clockOut(@PathVariable Long employeeId) {
+    @PutMapping("/clock-out/{userId}")
+    public AttendanceResponseDTO clockOut(@PathVariable Long userId) {
         log.info("clock-out in controller");
-        return attendanceService.clockOut(employeeId);
+        return attendanceService.clockOut(userId);
     }
 
-    @GetMapping("/employee/{employeeId}")
-    public List<AttendanceResponseDTO> getAttendanceByEmployee(@PathVariable Long employeeId) {
-        return attendanceService.getAttendanceByEmployee(employeeId);
+    @GetMapping("/employee/{userId}")
+    public List<AttendanceResponseDTO> getAttendanceByEmployee(@PathVariable Long userId) {
+        return attendanceService.getAttendanceByEmployee(userId);
     }
 
     @GetMapping("/today")
-    public AttendanceResponseDTO getTodayAttendance(@RequestParam Long employeeId) {
-        return attendanceService.getTodayAttendance(employeeId);
+    public AttendanceResponseDTO getTodayAttendance(@RequestParam Long userId) {
+        return attendanceService.getTodayAttendance(userId);
     }
 
     @GetMapping("/last")
-    public AttendanceResponseDTO getLastAttendance(@RequestParam Long employeeId) {
-        return attendanceService.getLastAttendance(employeeId);
+    public AttendanceResponseDTO getLastAttendance(@RequestParam Long userId) {
+        return attendanceService.getLastAttendance(userId);
     }
 
     @GetMapping("/my/month")
-    public List<AttendanceResponseDTO> getMyMonthlyAttendance(@RequestParam String month, @RequestParam Long employeeId) {
-        return attendanceService.getMyMonthlyAttendance(employeeId, month);
+    public List<AttendanceResponseDTO> getMyMonthlyAttendance(@RequestParam String month, @RequestParam Long userId) {
+        return attendanceService.getMyMonthlyAttendance(userId, month);
     }
 }
