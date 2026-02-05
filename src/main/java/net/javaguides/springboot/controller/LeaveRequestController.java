@@ -79,13 +79,18 @@ public class LeaveRequestController {
     }
 
     @GetMapping("/my")
-    public List<LeaveRequestResponseDTO> getMyLeaveRequests() {
-        return leaveRequestService.getMyLeaveRequests();
+    public Page<LeaveRequestResponseDTO> getMyLeaveRequests(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending() // 🔥 latest first
+        );
+        return leaveRequestService.getMyLeaveRequests(pageable);
     }
 
     @GetMapping("/leave-balance")
-    public LeaveBalanceResponse getLeaveBalance(@RequestParam Long employeeId) {
-        return leaveRequestService.getLeaveBalance(employeeId);
+    public LeaveBalanceResponse getLeaveBalance(@RequestParam Long userId) {
+        return leaveRequestService.getLeaveBalance(userId);
     }
 
     @GetMapping("/export/csv")

@@ -9,7 +9,11 @@ import net.javaguides.springboot.model.Employee;
 import net.javaguides.springboot.repository.EmployeeRepository;
 import net.javaguides.springboot.shared.exception.GeneralException;
 import net.javaguides.springboot.shared.exception.ResourceNotFoundException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
 
 import lombok.RequiredArgsConstructor;
 import net.javaguides.springboot.DTO.attendance.AttendanceRequestDTO;
@@ -122,22 +126,18 @@ public class AttendanceService {
         return mapToResponse(saved);
     }
 
-    public List<AttendanceResponseDTO> getAttendanceByEmployee(Long userId) {
-        // 🔑 Resolve employee from userId
+    public Page<AttendanceResponseDTO> getAttendanceByEmployee(Long userId, Pageable pageable) {
         Employee employee = employeeRepository.findByUser_UserId(userId)
-                .orElseThrow(() -> new RuntimeException("Employee not found for userId=" + userId));
-        LocalDate today = LocalDate.now();
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Employee not found for userId=", userId));
 
-        return attendanceRepository.findByEmployeeId(employee.getId())
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        return attendanceRepository.findByEmployeeId(employee.getId(), pageable).map(this::mapToResponse);
     }
 
     public AttendanceResponseDTO getTodayAttendance(Long userId) {
         // 🔑 Resolve employee from userId
         Employee employee = employeeRepository.findByUser_UserId(userId)
-                .orElseThrow(() -> new RuntimeException("Employee not found for userId=" + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found for userId=", userId));
 
         LocalDate today = LocalDate.now();
         log.info("Fetching today's attendance for employeeId={} on date={}", employee.getId(), today);
@@ -165,20 +165,20 @@ public class AttendanceService {
                 .orElse(null);
     }
 
-    public List<AttendanceResponseDTO> getMyMonthlyAttendance(Long userId, String month) {
+    public Page<AttendanceResponseDTO> getMyMonthlyAttendance(Long userId, String month, int page, int size) {
         // 🔑 Resolve employee from userId
         Employee employee = employeeRepository.findByUser_UserId(userId)
-                .orElseThrow(() -> new RuntimeException("Employee not found for userId = " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found for userId = ", userId));
 
         YearMonth yearMonth = YearMonth.parse(month); // 2026-01
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
 
+        Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
+
         return attendanceRepository
-                .findByEmployeeIdAndDateBetween(employee.getId(), start, end)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+                .findByEmployeeIdAndDateBetween(employee.getId(), start, end, pageable)
+                .map(this::mapToResponse);
     }
 
     // -------- Mapping --------

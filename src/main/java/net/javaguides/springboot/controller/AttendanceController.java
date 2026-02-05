@@ -7,6 +7,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javaguides.springboot.DTO.attendance.AttendanceRequestDTO;
 import net.javaguides.springboot.DTO.attendance.AttendanceResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import net.javaguides.springboot.service.AttendanceService;
@@ -41,8 +45,14 @@ public class AttendanceController {
     }
 
     @GetMapping("/employee/{userId}")
-    public List<AttendanceResponseDTO> getAttendanceByEmployee(@PathVariable Long userId) {
-        return attendanceService.getAttendanceByEmployee(userId);
+    public Page<AttendanceResponseDTO> getAttendanceByEmployee(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "7") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("date").descending());
+
+        return attendanceService.getAttendanceByEmployee(userId, pageable);
     }
 
     @GetMapping("/today")
@@ -56,7 +66,12 @@ public class AttendanceController {
     }
 
     @GetMapping("/my/month")
-    public List<AttendanceResponseDTO> getMyMonthlyAttendance(@RequestParam String month, @RequestParam Long userId) {
-        return attendanceService.getMyMonthlyAttendance(userId, month);
+    public Page<AttendanceResponseDTO> getMyMonthlyAttendance(
+            @RequestParam String month,
+            @RequestParam Long userId,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return attendanceService.getMyMonthlyAttendance(userId, month, page, size);
     }
 }

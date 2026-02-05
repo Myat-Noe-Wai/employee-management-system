@@ -4,12 +4,15 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import net.javaguides.springboot.model.Attendance;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
 	Optional<Attendance> findByDateAndEmployeeId(LocalDate date, Long employeeId);
+	Page<Attendance> findByEmployeeId(Long employeeId, Pageable pageable);
 	List<Attendance> findByEmployeeId(Long employeeId);
 
 	// 1. Today attendance
@@ -19,11 +22,9 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
 	List<Attendance> findByDateBetween(LocalDate from, LocalDate to);
 
 	// 3. Employee + date range
-	List<Attendance> findByEmployeeIdAndDateBetween(
-			Long employeeId,
-			LocalDate from,
-			LocalDate to
-	);
+	List<Attendance> findByEmployeeIdAndDateBetween(Long employeeId, LocalDate from, LocalDate to);
+
+	Page<Attendance> findByEmployeeIdAndDateBetween(Long employeeId, LocalDate start, LocalDate end, Pageable pageable);
 
 	Optional<Attendance> findTopByEmployeeIdOrderByDateDesc(Long employeeId);
 }

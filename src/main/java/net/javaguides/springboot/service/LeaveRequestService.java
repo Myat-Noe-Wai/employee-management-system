@@ -10,6 +10,8 @@ import net.javaguides.springboot.repository.LeaveRequestRepository;
 import net.javaguides.springboot.shared.exception.GeneralException;
 import net.javaguides.springboot.shared.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +42,7 @@ public class LeaveRequestService {
         return toResponseDTO(leaveRequest);
     }
 
-    public List<LeaveRequestResponseDTO> getMyLeaveRequests() {
+    public Page<LeaveRequestResponseDTO> getMyLeaveRequests(Pageable pageable) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Employee employee = employeeRepository
@@ -48,10 +50,9 @@ public class LeaveRequestService {
                 .orElseThrow(() ->
                         new GeneralException("Employee not found for logged-in user"));
 
-        return leaveRequestRepository.findByEmployeeId(employee.getId())
-                .stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
+        return leaveRequestRepository
+                .findByEmployeeId(employee.getId(), pageable)
+                .map(this::toResponseDTO);
     }
 
     // ---------------- Commands ----------------
@@ -90,16 +91,14 @@ public class LeaveRequestService {
         leaveRequestRepository.deleteById(id);
     }
 
-    public LeaveBalanceResponse getLeaveBalance(Long employeeId) {
-        log.info("Fetching leave balance for employeeId={}", employeeId);
+    public LeaveBalanceResponse getLeaveBalance(Long userId) {
+        log.info("Fetching leave balance for employeeId={}", userId);
+        // 🔑 Resolve employee from userId
+        Employee employee = employeeRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found for userId=", userId));
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> {
-                    log.error("Employee not found with id={}", employeeId);
-                    return new GeneralException("Employee not found");
-                });
         int totalDays = employee.getLeaveDay();
-        int usedDays = leaveRequestRepository.countApprovedLeaves(employeeId);
+        int usedDays = leaveRequestRepository.countApprovedLeaves(employee.getId());
 
         int remaining = totalDays - usedDays;
 
