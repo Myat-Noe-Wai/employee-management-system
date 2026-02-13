@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: springboot-react-mydemo
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/employee_management_system?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
+    username: myatnoe
+    password: aE3#H2jJ
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        jdbc:
+          time_zone: UTC
+    hibernate:
+      ddl-auto: update
+
+  jackson:
+    serialization:
+      WRITE_DATES_WITH_ZONE_ID: true
+    time-zone: Asia/Yangon
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+
+server:
+  port: 8081
+
+security:
+  jwt:
+    secret-key: s8#Gv2!kLz@rNp$QyW1^dTx3&VoUbKmC
+    expiration: 10000 # 86400000 for 24 hours, 180000 for 5 min
+    refresh-expiration: 604800000

@@ -1,9 +1,13 @@
 package net.javaguides.springboot.Impl;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
 import net.javaguides.springboot.DTO.user.UserResponseDTO;
+import net.javaguides.springboot.model.RefreshTokenEntity;
+import net.javaguides.springboot.repository.RefreshTokenRepository;
 import net.javaguides.springboot.repository.UserRepo;
 import net.javaguides.springboot.shared.config.JwtUtil;
 import net.javaguides.springboot.shared.exception.ApiResponse;
@@ -17,6 +21,7 @@ import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.service.UserService;
 
 @Service
+@RequiredArgsConstructor
 public class UserImpl implements UserService{
 	@Autowired
     private UserRepo userRepo;
@@ -26,6 +31,8 @@ public class UserImpl implements UserService{
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    private final RefreshTokenRepository refreshTokenRepository;
     
     @Override
     public ApiResponse<UserResponseDTO> addUser(UserDTO userDTO) {
@@ -62,6 +69,8 @@ public class UserImpl implements UserService{
         }
 
         String accessToken = jwtUtil.generateToken(user.getEmail());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+        createOrUpdateRefreshToken(user, refreshToken);
 
         return new LoginResponseDTO(
                 "Login success",
@@ -70,7 +79,8 @@ public class UserImpl implements UserService{
                 user.getUsername(),
                 user.getEmail(),
                 user.getRole(),
-                accessToken
+                accessToken,
+                refreshToken
         );
     }
 
@@ -89,5 +99,16 @@ public class UserImpl implements UserService{
                         null // token is null when fetching users
                 ))
                 .collect(Collectors.toList());
+    }
+
+    private void createOrUpdateRefreshToken(User user, String newToken) {
+        Optional<RefreshTokenEntity> existingTokenOpt = refreshTokenRepository.findByUser(user);
+
+        RefreshTokenEntity refreshTokenEntity = existingTokenOpt.orElse(new RefreshTokenEntity());
+        refreshTokenEntity.setUser(user);
+        refreshTokenEntity.setToken(newToken);
+        refreshTokenEntity.setExpiryDate(LocalDateTime.now().plusDays(7));
+
+        refreshTokenRepository.save(refreshTokenEntity);
     }
 }
