@@ -2,48 +2,109 @@
 
 ### 🔹 Project Overview
 
-The **Employee Management System** is a full-stack web application designed to streamline employee administration, attendance tracking, and leave management within an organization. The system supports **role-based access** for administrators and employees, ensuring secure and efficient workflows.
+The **Employee Management System** is a full-stack enterprise-style web application built to streamline workforce administration, attendance monitoring, and leave management within organizations. It implements **secure role-based access control**, automated attendance logic, and advanced data management features to ensure efficiency, transparency, and accuracy in HR operations.
+
+This system simulates real-world business workflows and demonstrates scalable architecture, secure authentication, and clean UI/UX practices suitable for production-ready applications.
 
 ---
 
 ### 🔹 Technologies Used
 
-* **Backend:** Java, Spring Boot, Spring Security, REST APIs
-* **Frontend:** React, Bootstrap
-* **Database:** MySQL
-* **Authentication:** Role-based login (Admin / Employee)
-* **Deployment:** Cloud-hosted application
+**Backend**
+
+* Java
+* Spring Boot
+* Spring Security
+* JWT + Refresh Token Authentication
+* RESTful API Architecture
+* DTO Pattern + Validation
+* Logging & Exception Handling
+
+**Frontend**
+
+* React
+* Bootstrap UI Components
+* Axios API Integration
+
+**Database**
+
+* MySQL (Relational Schema Design)
+
+**Deployment**
+
+* Cloud-hosted application environment
 
 ---
 
-### 🔹 Key Features
+### 🔹 System Architecture Highlights
 
-#### 👨‍💼 Admin Features
+* Role-based authorization (Admin / Employee)
+* Stateless authentication using JWT access tokens
+* Refresh token mechanism for session persistence
+* Layered architecture (Controller → Service → Repository)
+* Clean API structure with standardized responses
+* Pagination + Filtering support for scalable data retrieval
 
-* Manage employee records (create, update, delete)
-* Manage job titles (roles)
-* View employee attendance records
-* Approve or reject employee leave requests
+---
 
-#### 👩‍💻 Employee Features
+### 🔹 Core Features
 
-* Clock in and clock out daily attendance
-* Apply for leave requests
-* View personal attendance and leave history
+#### 👨‍💼 Admin Capabilities
+
+* Interactive dashboard with real-time statistics
+
+  * Total employees
+  * Present vs Absent today
+  * Pending leave requests
+  * Recent attendance logs
+* Full employee lifecycle management (Create, Update, Delete, Search)
+* Job title/role management
+* Advanced attendance tracking
+
+  * Auto status calculation (Present / Late / Half Day / Absent)
+  * Filter by employee, date range
+  * Export attendance reports (Excel / PDF)
+* Leave request administration
+
+  * Approve / Reject requests
+  * Status badges with color indicators
+  * Multi-criteria filtering
+  * CSV/Excel export
+
+---
+
+#### 👩‍💻 Employee Capabilities
+
+* Personal dashboard with:
+
+  * Today’s attendance status
+  * Remaining leave balance
+  * Last time-in record
+* Time In / Time Out tracking system
+* Weekly attendance view
+* Monthly attendance analytics
+
+  * Present / Absent / Half Days
+  * Total working hours
+  * Export reports (Excel / PDF)
+* Leave request submission + history tracking
 
 ---
 
 ### 🔹 Demo Access
 
-* **Project URL:** [http://13.61.161.105/login](http://13.61.161.105/login)
-* **Swagger API Docs:** http://13.61.161.105:8081/swagger-ui/index.html
+**Live System**
+http://13.61.161.105/login
 
-**Admin Account**
+**Swagger API Documentation**
+http://13.61.161.105:8081/swagger-ui/index.html
+
+**Admin Login**
 
 * Username: `admin@gmail.com`
 * Password: `admin`
 
-**Employee Account**
+**Employee Login**
 
 * Username: `myatnoewai@gmail.com`
 * Password: `myatnoewai`
@@ -52,15 +113,21 @@ The **Employee Management System** is a full-stack web application designed to s
 
 ### 🔹 Source Code
 
-* **Backend Repository:**
-  [https://github.com/Myat-Noe-Wai/employee-management-system](https://github.com/Myat-Noe-Wai/employee-management-system)
+**Backend Repository**
+https://github.com/Myat-Noe-Wai/employee-management-system
 
-* **Frontend Repository:**
-  [https://github.com/Myat-Noe-Wai/ems-frontend](https://github.com/Myat-Noe-Wai/ems-frontend)
+**Frontend Repository**
+https://github.com/Myat-Noe-Wai/ems-frontend
 
 ---
 
-### 🔹 Purpose
+### 🔹 Learning & Development Goals
 
-This project was developed to demonstrate **real-world full-stack development skills**, including RESTful API design, role-based authentication, clean architecture using DTOs, and frontend-backend integration using React and Spring Boot.
+This project was designed to demonstrate real-world **full-stack engineering competency**, including:
 
+* Secure authentication design
+* Enterprise-level API structuring
+* Role-based system architecture
+* Business logic implementation
+* State management between frontend and backend
+* Production-style features such as exports, analytics dashboards, and filters
