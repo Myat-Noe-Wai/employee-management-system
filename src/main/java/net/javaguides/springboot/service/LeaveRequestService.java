@@ -1,5 +1,6 @@
 package net.javaguides.springboot.service;
 import lombok.extern.slf4j.Slf4j;
+import net.javaguides.springboot.DTO.event.LeaveRequestEvent;
 import net.javaguides.springboot.DTO.leaverequest.LeaveBalanceResponse;
 import net.javaguides.springboot.DTO.leaverequest.LeaveRequestRequestDTO;
 import net.javaguides.springboot.DTO.leaverequest.LeaveRequestResponseDTO;
@@ -10,6 +11,7 @@ import net.javaguides.springboot.repository.LeaveRequestRepository;
 import net.javaguides.springboot.shared.exception.GeneralException;
 import net.javaguides.springboot.shared.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +29,12 @@ public class LeaveRequestService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
+    @Autowired
+    private EmailService emailService;
 
     public List<LeaveRequestResponseDTO> getAllLeaveRequests() {
         return leaveRequestRepository.findAll()
@@ -72,19 +80,66 @@ public class LeaveRequestService {
         leaveRequest.setStatus("Pending");
 
         LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+
+        // Get all admin emails dynamically
+        List<Employee> admins = employeeRepository.findByUser_Role("admin");
+        System.out.println("Admin " + admins.toArray().length);
+        List<String> adminEmails = admins.stream()
+                .map(emp -> emp.getUser().getEmail())
+                .toList();
+
+        // Send emails to employee and all admins
+        emailService.sendLeaveSubmissionEmail(
+                employee.getUser().getEmail(),
+                adminEmails,
+                employee.getFirstName() + " " + employee.getLastName(),
+                leaveRequest.getLeaveType().toString(),
+                leaveRequest.getStartDate().toString(),
+                leaveRequest.getEndDate().toString(),
+                leaveRequest.getReason()
+        );
+
         return toResponseDTO(saved);
     }
 
     public LeaveRequestResponseDTO approveLeaveRequest(Long id) {
         LeaveRequest leaveRequest = getEntity(id);
         leaveRequest.setStatus("Approved");
-        return toResponseDTO(leaveRequestRepository.save(leaveRequest));
+        LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+
+        String html = emailService.buildLeaveEmailHtml(
+                leaveRequest.getEmployee().getFirstName() + " " + leaveRequest.getEmployee().getLastName(),
+                saved.getLeaveType().name(),
+                saved.getStartDate().toString(),
+                saved.getEndDate().toString(),
+                saved.getReason(),
+                saved.getStatus(),
+                "Your leave request has been approved."
+        );
+
+        emailService.sendHtmlEmail(leaveRequest.getEmployee().getUser().getEmail(), "Leave Request Approved", html);
+
+        return toResponseDTO(saved);
     }
 
     public LeaveRequestResponseDTO rejectLeaveRequest(Long id) {
         LeaveRequest leaveRequest = getEntity(id);
         leaveRequest.setStatus("Rejected");
-        return toResponseDTO(leaveRequestRepository.save(leaveRequest));
+        LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+
+        String html = emailService.buildLeaveEmailHtml(
+                leaveRequest.getEmployee().getFirstName() + " " + leaveRequest.getEmployee().getLastName(),
+                saved.getLeaveType().name(),
+                saved.getStartDate().toString(),
+                saved.getEndDate().toString(),
+                saved.getReason(),
+                saved.getStatus(),
+                "Your leave request has been rejected. Please contact your manager if you have questions."
+        );
+
+        emailService.sendHtmlEmail(leaveRequest.getEmployee().getUser().getEmail(), "Leave Request Rejected", html);
+
+        return toResponseDTO(saved);
     }
 
     public void deleteLeaveRequest(Long id) {

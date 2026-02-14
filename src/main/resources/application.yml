@@ -21,6 +21,18 @@ spring:
       WRITE_DATES_WITH_ZONE_ID: true
     time-zone: Asia/Yangon
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: myatnoew10@gmail.com
+    password: vpknzjzczpilnveu
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 logging:
   level:
     org.hibernate.SQL: DEBUG
@@ -31,5 +43,5 @@ server:
 security:
   jwt:
     secret-key: s8#Gv2!kLz@rNp$QyW1^dTx3&VoUbKmC
-    expiration: 10000 # 86400000 for 24 hours, 180000 for 5 min
+    expiration: 86400000 # 86400000 for 24 hours, 180000 for 5 min
     refresh-expiration: 604800000
