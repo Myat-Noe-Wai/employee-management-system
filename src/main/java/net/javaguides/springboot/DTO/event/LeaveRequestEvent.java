@@ -9,5 +9,6 @@ public class LeaveRequestEvent {
     private String email;
     private String subject;
     private String message;
+    private final byte[] attachment;
 }
 

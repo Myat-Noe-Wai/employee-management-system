@@ -117,7 +117,14 @@ public class LeaveRequestService {
                 "Your leave request has been approved."
         );
 
-        emailService.sendHtmlEmail(leaveRequest.getEmployee().getUser().getEmail(), "Leave Request Approved", html);
+        publisher.publishEvent(
+                new LeaveRequestEvent(
+                        leaveRequest.getEmployee().getUser().getEmail(),
+                        "Leave Request Approved",
+                        html,
+                        null
+                )
+        );
 
         return toResponseDTO(saved);
     }
@@ -137,7 +144,14 @@ public class LeaveRequestService {
                 "Your leave request has been rejected. Please contact your manager if you have questions."
         );
 
-        emailService.sendHtmlEmail(leaveRequest.getEmployee().getUser().getEmail(), "Leave Request Rejected", html);
+        publisher.publishEvent(
+                new LeaveRequestEvent(
+                        leaveRequest.getEmployee().getUser().getEmail(),
+                        "Leave Request Rejected",
+                        html,
+                        null
+                )
+        );
 
         return toResponseDTO(saved);
     }

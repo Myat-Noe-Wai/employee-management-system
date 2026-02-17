@@ -14,11 +14,20 @@ public class EmailEventListener {
 
     @EventListener
     public void handleLeaveEvent(LeaveRequestEvent event){
-        emailService.sendHtmlEmail(
-                event.getEmail(),
-                event.getSubject(),
-                event.getMessage()
-        );
+        if(event.getAttachment() != null){
+            emailService.sendPayslipWithAttachment(
+                    event.getEmail(),
+                    event.getSubject(),
+                    event.getMessage(),
+                    event.getAttachment()
+            );
+        }else{
+            emailService.sendHtmlEmail(
+                    event.getEmail(),
+                    event.getSubject(),
+                    event.getMessage()
+            );
+        }
     }
 }
 

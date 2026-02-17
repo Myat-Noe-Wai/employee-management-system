@@ -133,4 +133,25 @@ public class EmailService {
                 extraMessage
         );
     }
+
+    @Async
+    public void sendPayslipWithAttachment(String to, String subject, String html, byte[] pdf) {
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(html, true);
+
+            helper.addAttachment("Payslip.pdf",
+                    new org.springframework.core.io.ByteArrayResource(pdf));
+
+            mailSender.send(message);
+
+        } catch (Exception e) {
+            log.error("Failed to send payslip email {}", e.getMessage());
+        }
+    }
 }
