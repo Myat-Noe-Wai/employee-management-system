@@ -1,17 +1,20 @@
 package net.javaguides.springboot.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.javaguides.springboot.DTO.event.LeaveRequestEvent;
 import net.javaguides.springboot.DTO.payslip.PayslipRequestDTO;
 import net.javaguides.springboot.model.Employee;
 import net.javaguides.springboot.model.Payslip;
 import net.javaguides.springboot.repository.EmployeeRepository;
 import net.javaguides.springboot.repository.PayslipRepository;
+import net.javaguides.springboot.shared.exception.ResourceNotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PayslipService {
 
     private final PayslipRepository payslipRepository;
@@ -20,9 +23,9 @@ public class PayslipService {
     private final PayslipPdfGenerator pdfGenerator;
 
     public Payslip generatePayslip(PayslipRequestDTO dto) {
-
+        log.info("Generating payslip for employee: {}", dto.getEmployeeId());
         Employee employee = employeeRepository.findById(dto.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", dto.getEmployeeId()));
 
         double totalEarnings =
                 dto.getBasicSalary()
