@@ -31,6 +31,7 @@ public class AttendanceService {
     private final EmployeeRepository employeeRepository;
 
     public List<AttendanceResponseDTO> getAllAttendance(Long employeeId, LocalDate fromDate, LocalDate toDate) {
+        log.info("Getting all attendance");
         List<Attendance> list;
 
         // 1️⃣ Default → today
