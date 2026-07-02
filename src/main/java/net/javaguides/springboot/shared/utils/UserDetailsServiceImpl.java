@@ -3,10 +3,14 @@ package net.javaguides.springboot.shared.utils;
 import lombok.RequiredArgsConstructor;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.repository.UserRepo;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +26,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found: " + email));
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail())
-                .password(user.getPassword())
-                .authorities("ROLE_" + user.getRole().toUpperCase())
-                .build();
+        List<GrantedAuthority> authorities = user.getRole()
+                .getPermissions()
+                .stream()
+                .map(p -> (GrantedAuthority) new SimpleGrantedAuthority(p.getName()))
+                .toList();
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                authorities
+        );
     }
 }
 

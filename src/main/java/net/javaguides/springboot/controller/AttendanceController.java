@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import net.javaguides.springboot.service.AttendanceService;
 
@@ -25,6 +26,7 @@ public class AttendanceController {
     private final AttendanceService attendanceService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('VIEW_ALL_ATTENDANCE')")
     public List<AttendanceResponseDTO> getAllAttendance(
             @RequestParam(required = false) Long employeeId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
@@ -34,17 +36,20 @@ public class AttendanceController {
     }
 
     @PostMapping("/clock-in")
+    @PreAuthorize("hasAuthority('CLOCK_IN')")
     public AttendanceResponseDTO clockIn(@RequestBody AttendanceRequestDTO dto) {
         return attendanceService.clockIn(dto);
     }
 
     @PutMapping("/clock-out/{userId}")
+    @PreAuthorize("hasAuthority('CLOCK_OUT')")
     public AttendanceResponseDTO clockOut(@PathVariable Long userId) {
         log.info("clock-out in controller");
         return attendanceService.clockOut(userId);
     }
 
     @GetMapping("/employee/{userId}")
+    @PreAuthorize("hasAuthority('VIEW_OWN_ATTENDANCE')")
     public Page<AttendanceResponseDTO> getAttendanceByEmployee(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "0") int page,
@@ -56,6 +61,7 @@ public class AttendanceController {
     }
 
     @GetMapping("/today")
+    @PreAuthorize("hasAuthority('VIEW_OWN_ATTENDANCE')")
     public AttendanceResponseDTO getTodayAttendance(@RequestParam Long userId) {
         return attendanceService.getTodayAttendance(userId);
     }
@@ -66,6 +72,7 @@ public class AttendanceController {
     }
 
     @GetMapping("/my/month")
+    @PreAuthorize("hasAuthority('VIEW_OWN_ATTENDANCE')")
     public Page<AttendanceResponseDTO> getMyMonthlyAttendance(
             @RequestParam String month,
             @RequestParam Long userId,

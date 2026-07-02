@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import net.javaguides.springboot.DTO.jobtitle.JobTitleRequestDTO;
 import net.javaguides.springboot.DTO.jobtitle.JobTitleResponseDTO;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,11 +26,13 @@ public class JobTitleController {
     private final JobTitleService jobTitleService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('VIEW_JOB_TITLE')")
     public List<JobTitleResponseDTO> getAllJobTitles() {
         return jobTitleService.getAllJobTitles();
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('CREATE_JOB_TITLE')")
     public JobTitleResponseDTO createJobTitle(
             @RequestBody JobTitleRequestDTO dto) {
         return jobTitleService.createJobTitle(dto);
@@ -42,6 +45,7 @@ public class JobTitleController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('UPDATE_JOB_TITLE')")
     public JobTitleResponseDTO updateJobTitle(
             @PathVariable Long id,
             @RequestBody JobTitleRequestDTO dto) {
@@ -49,6 +53,7 @@ public class JobTitleController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('DELETE_JOB_TITLE')")
     public void deleteJobTitle(@PathVariable Long id) {
         jobTitleService.deleteJobTitle(id);
     }

@@ -19,6 +19,8 @@ This system simulates real-world business workflows and demonstrates scalable ar
 * RESTful API Architecture
 * DTO Pattern + Validation
 * Logging & Exception Handling
+* Flyway (Database Migration)
+* Role-Based Access Control (RBAC)
 
 **Frontend**
 
@@ -38,12 +40,15 @@ This system simulates real-world business workflows and demonstrates scalable ar
 
 ### 🔹 System Architecture Highlights
 
-* Role-based authorization (Admin / Employee)
-* Stateless authentication using JWT access tokens
-* Refresh token mechanism for session persistence
+* Role-Based Access Control (RBAC) using Roles and Permissions
+* Fine-grained authorization with Spring Security @PreAuthorize
+* Stateless authentication using JWT Access Token + Refresh Token
+* Secure REST APIs protected by permission-based authorization
+* Database migration with Flyway
 * Layered architecture (Controller → Service → Repository)
-* Clean API structure with standardized responses
-* Pagination + Filtering support for scalable data retrieval
+* DTO pattern with request/response separation
+* Standardized API responses
+* Pagination, filtering, and data export support
 
 ---
 
@@ -57,7 +62,7 @@ This system simulates real-world business workflows and demonstrates scalable ar
   * Present vs Absent today
   * Pending leave requests
   * Recent attendance logs
-* Full employee lifecycle management (Create, Update, Delete, Search)
+* Employee management secured by permission-based authorization (View, Create, Update, Delete)
 * Job title/role management
 * Advanced attendance tracking
 
@@ -127,7 +132,9 @@ This project was designed to demonstrate real-world **full-stack engineering com
 
 * Secure authentication design
 * Enterprise-level API structuring
-* Role-based system architecture
+* Enterprise RBAC architecture using roles and permissions
+* Fine-grained authorization using Spring Security Method Security
+* Database versioning with Flyway
 * Business logic implementation
 * State management between frontend and backend
 * Production-style features such as exports, analytics dashboards, and filters

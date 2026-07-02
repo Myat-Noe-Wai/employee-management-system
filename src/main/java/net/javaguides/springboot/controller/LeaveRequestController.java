@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -35,6 +36,7 @@ public class LeaveRequestController {
     private final LeaveRequestRepository repository;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('VIEW_ALL_LEAVE')")
     public Page<LeaveRequest> getLeaveRequests(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
@@ -59,26 +61,31 @@ public class LeaveRequestController {
     }
 
     @PostMapping("/apply")
+    @PreAuthorize("hasAuthority('APPLY_LEAVE')")
     public LeaveRequestResponseDTO applyForLeave(@RequestBody LeaveRequestRequestDTO dto) {
         return leaveRequestService.applyForLeave(dto);
     }
 
     @PutMapping("/{id}/approve")
+    @PreAuthorize("hasAuthority('APPROVE_LEAVE')")
     public LeaveRequestResponseDTO approveLeaveRequest(@PathVariable Long id) {
         return leaveRequestService.approveLeaveRequest(id);
     }
 
     @PutMapping("/{id}/reject")
+    @PreAuthorize("hasAuthority('REJECT_LEAVE')")
     public LeaveRequestResponseDTO rejectLeaveRequest(@PathVariable Long id) {
         return leaveRequestService.rejectLeaveRequest(id);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('DELETE_LEAVE')")
     public void deleteLeaveRequest(@PathVariable Long id) {
         leaveRequestService.deleteLeaveRequest(id);
     }
 
     @GetMapping("/my")
+    @PreAuthorize("hasAuthority('VIEW_OWN_LEAVE')")
     public Page<LeaveRequestResponseDTO> getMyLeaveRequests(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size
@@ -89,11 +96,13 @@ public class LeaveRequestController {
     }
 
     @GetMapping("/leave-balance")
+    @PreAuthorize("hasAuthority('VIEW_OWN_LEAVE')")
     public LeaveBalanceResponse getLeaveBalance(@RequestParam Long userId) {
         return leaveRequestService.getLeaveBalance(userId);
     }
 
     @GetMapping("/export/csv")
+    @PreAuthorize("hasAuthority('EXPORT_LEAVE')")
     public void exportCsv(HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
         response.setHeader("Content-Disposition", "attachment; filename=leave_requests.csv");

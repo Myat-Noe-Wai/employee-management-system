@@ -11,6 +11,7 @@ import net.javaguides.springboot.service.EmployeeService;
 import net.javaguides.springboot.shared.exception.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,11 +35,13 @@ public class EmployeeController {
 	private final EmployeeService employeeService;
 
 	@GetMapping
+	@PreAuthorize("hasAuthority('VIEW_EMPLOYEE')")
 	public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployees() {
 		return ResponseEntity.ok(employeeService.getAllEmployees());
 	}
 
 	@PostMapping
+	@PreAuthorize("hasAuthority('CREATE_EMPLOYEE')")
 	public ResponseEntity<ApiResponse<EmployeeResponseDTO>> createEmployee(@RequestBody EmployeeRequestDTO requestDTO) {
 		return ResponseEntity.ok(employeeService.createEmployee(requestDTO));
 	}
@@ -49,6 +52,7 @@ public class EmployeeController {
 	}
 
 	@PutMapping("/{id}")
+	@PreAuthorize("hasAuthority('UPDATE_EMPLOYEE')")
 	public ResponseEntity<EmployeeResponseDTO> updateEmployee(
 			@PathVariable Long id,
 			@RequestBody EmployeeRequestDTO requestDTO) {
@@ -56,6 +60,7 @@ public class EmployeeController {
 	}
 
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAuthority('DELETE_EMPLOYEE')")
 	public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
 		employeeService.deleteEmployee(id);
 		return ResponseEntity.noContent().build();

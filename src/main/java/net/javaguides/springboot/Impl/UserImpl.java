@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import net.javaguides.springboot.DTO.user.UserResponseDTO;
 import net.javaguides.springboot.model.RefreshTokenEntity;
+import net.javaguides.springboot.model.Role;
 import net.javaguides.springboot.repository.RefreshTokenRepository;
+import net.javaguides.springboot.repository.RoleRepository;
 import net.javaguides.springboot.repository.UserRepo;
 import net.javaguides.springboot.shared.config.JwtUtil;
 import net.javaguides.springboot.shared.exception.ApiResponse;
@@ -33,6 +35,7 @@ public class UserImpl implements UserService{
     private JwtUtil jwtUtil;
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RoleRepository roleRepository;
     
     @Override
     public ApiResponse<UserResponseDTO> addUser(UserDTO userDTO) {
@@ -40,7 +43,10 @@ public class UserImpl implements UserService{
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setRole("employee"); // default role
+        Role employeeRole = roleRepository.findByName("EMPLOYEE")
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        user.setRole(employeeRole);
         User savedUser = userRepo.save(user);
 
         String token = jwtUtil.generateToken(savedUser.getEmail());
@@ -49,7 +55,7 @@ public class UserImpl implements UserService{
                 savedUser.getUserId(),
                 savedUser.getUsername(),
                 savedUser.getEmail(),
-                savedUser.getRole(),
+                savedUser.getRole().getName(),
                 token
         );
 
@@ -78,7 +84,7 @@ public class UserImpl implements UserService{
                 user.getUserId(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getRole(),
+                user.getRole().getName(),
                 accessToken,
                 refreshToken
         );
@@ -95,7 +101,7 @@ public class UserImpl implements UserService{
                         user.getUserId(),
                         user.getUsername(),
                         user.getEmail(),
-                        user.getRole(),
+                        user.getRole().getName(),
                         null // token is null when fetching users
                 ))
                 .collect(Collectors.toList());

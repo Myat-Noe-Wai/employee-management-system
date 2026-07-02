@@ -82,7 +82,7 @@ public class LeaveRequestService {
         LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
 
         // Get all admin emails dynamically
-        List<Employee> admins = employeeRepository.findByUser_Role("admin");
+        List<Employee> admins = employeeRepository.findByUser_Role_Name("admin");
         System.out.println("Admin " + admins.toArray().length);
         List<String> adminEmails = admins.stream()
                 .map(emp -> emp.getUser().getEmail())
